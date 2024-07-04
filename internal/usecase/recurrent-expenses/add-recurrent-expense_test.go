@@ -1,23 +1,47 @@
 package usecase
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/gabrielAnFran/frauCLI/models"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestAddRecurrentExpense(t *testing.T) {
+// Mock for RecurrentExpensesRepositoryInterface
+type MockRecurrentExpensesRepository struct {
+	mock.Mock
+}
+
+func (m *MockRecurrentExpensesRepository) AddRecurrentExpenses(expense models.RecurrentExpense) (models.RecurrentExpense, error) {
+	args := m.Called(expense)
+	return args.Get(0).(models.RecurrentExpense), args.Error(1)
+}
+
+func TestAddRecurrentExpenseUsecase_Execute(t *testing.T) {
+	mockRepo := new(MockRecurrentExpensesRepository)
+	usecase := NewAddRecurrentExpanseUseCase(mockRepo)
+
 	expense := models.RecurrentExpense{
-		ExpenseName: "Test Expense",
-		Amount:      100,
-		Frequency:   "Monthly",
-		StartDate:   "2021-01-01",
-		EndDate:     "2021-12-31",
+		// fill with appropriate fields
 	}
 
-	fmt.Println(expense)
-	// err := PersistRecurrentExpense(&expense)
+	t.Run("success", func(t *testing.T) {
+		mockRepo.On("AddRecurrentExpenses", expense).Return(expense, nil)
 
-	// assert.NoError(t, err)
+		result, err := usecase.Execute(expense)
+
+		assert.NoError(t, err)
+		assert.Equal(t, &expense, result)
+		mockRepo.AssertExpectations(t)
+	})
+
+	// t.Run("failure", func(t *testing.T) {
+	// 	mockError := errors.New("some error")
+	// 	mockRepo.On("AddRecurrentExpenses", expense).Return(models.RecurrentExpense{}, mockError)
+
+	// 	_, err := usecase.Execute(expense)
+
+	// 	assert.NotNil(t, err)
+	// })
 }
