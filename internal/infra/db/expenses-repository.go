@@ -10,6 +10,7 @@ import (
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
+// test
 type RecurrentExpensesRepository struct{}
 
 func NewRecurrentExpensesRepository() *RecurrentExpensesRepository {
